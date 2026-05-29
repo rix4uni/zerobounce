@@ -2,6 +2,9 @@
 
 A Go CLI tool to verify email addresses through format validation, MX record checks, and SMTP verification.
 
+<img width="1049" height="712" alt="image" src="https://github.com/user-attachments/assets/a28d6726-17ee-4f4f-a0c2-dfd7d33a08c3" />
+
+
 ## Features
 - **Format Validation**: Validates email syntax according to RFC standards
 - **MX Record Check**: Verifies domain has Mail Exchange records configured
