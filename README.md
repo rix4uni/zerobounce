@@ -91,9 +91,9 @@ cat emails.txt | zerobounce --concurrent 20 --valid --output valid-emails.txt
 ```
 
 ## Output
+```console
 rix4uni@krazeplanet.com [FORMAT:VALID] [MX:FOUND] [SMTP:FAILED] => INVALID
 support@hackerone.com [FORMAT:VALID] [MX:FOUND] [SMTP:CATCHALL] => VALID
-security@skybriz.com [FORMAT:VALID] [MX:FOUND] [SMTP:BLOCKED] => VALID
 contact@krazeplanet.com [FORMAT:VALID] [MX:FOUND] [SMTP:PASSED] => VALID
 ```
 
