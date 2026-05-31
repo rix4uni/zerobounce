@@ -612,7 +612,7 @@ func VerifyEmail(email string) VerifyResult {
 
 func main() {
 	// Parse command-line flags
-	var outputJSON, outputCSV, silent, version bool
+	var outputJSON, outputCSV, silent, version, valid bool
 	var concurrent int
 	pflag.BoolVar(&outputJSON, "json", false, "Output results in JSON format")
 	pflag.BoolVar(&outputCSV, "csv", false, "Output results in CSV format")
@@ -620,6 +620,7 @@ func main() {
 	pflag.BoolVar(&version, "version", false, "Print the version of the tool and exit.")
 	pflag.BoolVar(&verbose, "verbose", false, "Show detailed error messages for each check.")
 	pflag.IntVar(&concurrent, "concurrent", 10, "Number of concurrent email checks")
+	pflag.BoolVar(&valid, "valid", false, "Print only valid emails")
 	pflag.Parse()
 
 	if !silent {
@@ -689,6 +690,11 @@ func main() {
 						checkedCount++
 					}
 				}
+			}
+
+			// Skip if --valid is set and email is not valid
+			if valid && !result.IsValid {
+				return
 			}
 
 			printResult(result, outputJSON, outputCSV, checkedCount, false)

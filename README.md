@@ -20,8 +20,8 @@ go install github.com/rix4uni/zerobounce@latest
 
 **Pre-built Binaries:**
 ```console
-wget https://github.com/rix4uni/zerobounce/releases/download/v0.0.1/zerobounce-linux-amd64-0.0.1.tgz
-tar -xvzf zerobounce-linux-amd64-0.0.1.tgz
+wget https://github.com/rix4uni/zerobounce/releases/download/v0.0.2/zerobounce-linux-amd64-0.0.2.tgz
+tar -xvzf zerobounce-linux-amd64-0.0.2.tgz
 mv zerobounce ~/go/bin/
 ```
 
@@ -38,6 +38,7 @@ Usage of zerobounce:
       --csv              Output results in CSV format
       --json             Output results in JSON format
       --silent           Silent mode.
+      --valid            Print only valid emails.
       --verbose          Show detailed error messages for each check.
       --version          Print the version of the tool and exit.
 ```
@@ -51,6 +52,7 @@ echo "user@example.com" | zerobounce
 Multiple Emails from File:
 ```console
 cat emails.txt | zerobounce
+```
 
 ## Output
 rix4uni@krazeplanet.com [FORMAT:VALID] [MX:FOUND] [SMTP:FAILED] => INVALID
