@@ -19,7 +19,7 @@ import (
 )
 
 // ANSI color codes for terminal output
-const (
+var (
 	colorReset  = "\033[0m"
 	colorGreen  = "\033[32m"
 	colorRed    = "\033[31m"
@@ -27,8 +27,17 @@ const (
 	colorCyan   = "\033[36m"
 )
 
+func disableColors() {
+	colorReset = ""
+	colorGreen = ""
+	colorRed = ""
+	colorYellow = ""
+	colorCyan = ""
+}
+
 var verbose bool
 var stdoutMu sync.Mutex
+var fileMu sync.Mutex
 
 func printCheckmark() {
 	fmt.Printf("%s✓%s ", colorGreen, colorReset)
@@ -612,8 +621,9 @@ func VerifyEmail(email string) VerifyResult {
 
 func main() {
 	// Parse command-line flags
-	var outputJSON, outputCSV, silent, version, valid bool
+	var outputJSON, outputCSV, silent, version, valid, noColor bool
 	var concurrent int
+	var outputFile string
 	pflag.BoolVar(&outputJSON, "json", false, "Output results in JSON format")
 	pflag.BoolVar(&outputCSV, "csv", false, "Output results in CSV format")
 	pflag.BoolVar(&silent, "silent", false, "Silent mode.")
@@ -621,7 +631,13 @@ func main() {
 	pflag.BoolVar(&verbose, "verbose", false, "Show detailed error messages for each check.")
 	pflag.IntVar(&concurrent, "concurrent", 10, "Number of concurrent email checks")
 	pflag.BoolVar(&valid, "valid", false, "Print only valid emails")
+	pflag.BoolVar(&noColor, "nc", false, "Disable color output")
+	pflag.StringVar(&outputFile, "output", "", "Append only valid emails to the specified file")
 	pflag.Parse()
+
+	if noColor {
+		disableColors()
+	}
 
 	if !silent {
 		banner.PrintBanner()
@@ -655,6 +671,18 @@ func main() {
 	if len(emails) == 0 {
 		fmt.Println("Error: No email addresses provided")
 		os.Exit(1)
+	}
+
+	// Open output file for appending if --output is set
+	var outFile *os.File
+	if outputFile != "" {
+		var err error
+		outFile, err = os.OpenFile(outputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error opening output file: %v\n", err)
+			os.Exit(1)
+		}
+		defer outFile.Close()
 	}
 
 	// Print CSV header before any concurrent output
@@ -695,6 +723,13 @@ func main() {
 			// Skip if --valid is set and email is not valid
 			if valid && !result.IsValid {
 				return
+			}
+
+			// Append valid email to output file if --output is set
+			if outFile != nil && result.IsValid {
+				fileMu.Lock()
+				fmt.Fprintf(outFile, "%s\n", result.Email)
+				fileMu.Unlock()
 			}
 
 			printResult(result, outputJSON, outputCSV, checkedCount, false)

@@ -11,8 +11,13 @@ A Go CLI tool to verify email addresses through format validation, MX record che
 - **SMTP Verification**: Connects to mail servers to verify email address existence
 - **DNS Fallback**: Automatically uses public DNS (Google, Cloudflare) if system DNS fails
 - **Catch-All Detection**: Identifies and flags catch-all email servers
+- **IP Block Handling**: Detects SMTP IP/reputation blocks (e.g., Proofpoint) and treats as valid
 - **Multiple Output Formats**: Human-readable, JSON, and CSV output
 - **Bulk Processing**: Read emails from file or pipe for batch verification
+- **Concurrent Checking**: Verify multiple emails simultaneously for faster processing
+- **Valid Email Filter**: Option to show only valid emails
+- **Color Control**: Enable/disable colored terminal output
+- **Save to File**: Append valid emails directly to a file
 
 ## Installation
 
@@ -23,8 +28,9 @@ go install github.com/rix4uni/zerobounce@latest
 
 **Pre-built Binaries:**
 ```console
-wget https://github.com/rix4uni/zerobounce/releases/download/v0.0.2/zerobounce-linux-amd64-0.0.2.tgz
-tar -xvzf zerobounce-linux-amd64-0.0.2.tgz
+wget https://github.com/rix4uni/zerobounce/releases/download/v0.0.3/zerobounce-linux-amd64-0.0.3.tgz
+tar -xvzf zerobounce-linux-amd64-0.0.3.tgz
+rm -rf zerobounce-linux-amd64-0.0.3.tgz
 mv zerobounce ~/go/bin/
 ```
 
@@ -40,6 +46,8 @@ Usage of zerobounce:
       --concurrent int   Number of concurrent email checks (default 10)
       --csv              Output results in CSV format
       --json             Output results in JSON format
+      --nc               Disable color output
+      --output string    Append only valid emails to the specified file
       --silent           Silent mode.
       --valid            Print only valid emails.
       --verbose          Show detailed error messages for each check.
@@ -57,9 +65,35 @@ Multiple Emails from File:
 cat emails.txt | zerobounce
 ```
 
+Concurrent Checking (faster for large lists):
+```console
+cat emails.txt | zerobounce --concurrent 10
+```
+
+Filter Only Valid Emails:
+```console
+cat emails.txt | zerobounce --valid
+```
+
+Disable Color Output:
+```console
+cat emails.txt | zerobounce --nc
+```
+
+Save Valid Emails to File:
+```console
+cat emails.txt | zerobounce --output valid-emails.txt
+```
+
+Combined (concurrent + valid only + save to file):
+```console
+cat emails.txt | zerobounce --concurrent 20 --valid --output valid-emails.txt
+```
+
 ## Output
 rix4uni@krazeplanet.com [FORMAT:VALID] [MX:FOUND] [SMTP:FAILED] => INVALID
 support@hackerone.com [FORMAT:VALID] [MX:FOUND] [SMTP:CATCHALL] => VALID
+security@skybriz.com [FORMAT:VALID] [MX:FOUND] [SMTP:BLOCKED] => VALID
 contact@krazeplanet.com [FORMAT:VALID] [MX:FOUND] [SMTP:PASSED] => VALID
 ```
 
